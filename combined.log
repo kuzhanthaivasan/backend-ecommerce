@@ -1,0 +1,35 @@
+{"level":"info","message":"Order Tracking Service running on port 5031","timestamp":"2025-03-26T06:21:32.981Z"}
+{"level":"info","message":"Connected to MongoDB successfully","timestamp":"2025-03-26T06:21:33.006Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:05.572Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:05.584Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:07.027Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:07.033Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:07.522Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:07.527Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:07.938Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:07.943Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:08.370Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:08.374Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:08.546Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:08.550Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:08.714Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:08.718Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:09.563Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:22:09.567Z"}
+{"level":"info","message":"Order Tracking Service running on port 5031","timestamp":"2025-03-26T06:24:02.641Z"}
+{"level":"info","message":"Connected to MongoDB successfully","timestamp":"2025-03-26T06:24:02.671Z"}
+{"contactInfo":"","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:24:34.858Z"}
+{"contactInfo":"","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:24:36.619Z"}
+{"contactInfo":"","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:24:37.666Z"}
+{"level":"info","message":"Order Tracking Service running on port 5031","timestamp":"2025-03-26T06:26:28.460Z"}
+{"level":"info","message":"Connected to MongoDB successfully","timestamp":"2025-03-26T06:26:28.483Z"}
+{"contactInfo":"","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:26:32.420Z"}
+{"contactInfo":"","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:26:33.050Z"}
+{"level":"info","message":"Order Tracking Service running on port 5031","timestamp":"2025-03-26T06:27:49.477Z"}
+{"level":"info","message":"Connected to MongoDB successfully","timestamp":"2025-03-26T06:27:49.500Z"}
+{"level":"info","message":"Order Tracking Service running on port 5031","timestamp":"2025-03-26T06:30:52.309Z"}
+{"level":"info","message":"Connected to MongoDB successfully","timestamp":"2025-03-26T06:30:52.332Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742881226510","timestamp":"2025-03-26T06:31:18.771Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742881226510","timestamp":"2025-03-26T06:31:18.786Z"}
+{"contactInfo":"*************************","contactMethod":"Email","level":"info","message":"Order Status Request","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:31:47.251Z"}
+{"contactMethod":"Email","level":"warn","message":"Order not found","orderId":"ORD-1742909843185","timestamp":"2025-03-26T06:31:47.255Z"}
