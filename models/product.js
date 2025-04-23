@@ -29,7 +29,7 @@ const productSchema = new mongoose.Schema({
   customOption: {
     type: String,
     default: '',
-    enum: ['None', 'Engraving', 'Fingerprint', 'Image','combined']
+    enum: ['None', 'Engraving', 'Fingerprint', 'image','combined']
   },
   images: [{
     type: String,  // Base64 encoded image string
