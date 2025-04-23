@@ -95,7 +95,7 @@ const mapProducts = (products, defaultDescription) => {
     return {
       id: product._id,
       name: product.name,
-      price: product.price.toFixed(2),
+      price: `${product.price.toFixed(2)} gram`, // Added "gram" to the price
       mainImage: mainImage,
       image: mainImage, // For frontend integration endpoints
       images: processedImages,
@@ -244,7 +244,7 @@ router.get('/products/kids', async (req, res) => {
       return {
         id: product._id,
         name: product.name,
-        price: product.price.toFixed(2),
+        price: `${product.price.toFixed(2)} gram`, // Added "gram" to the price
         // Return first image for outside display
         mainImage: mainImage,
         // Return all processed images for inside display
@@ -295,6 +295,9 @@ router.get('/products/:id', async (req, res) => {
     
     // Ensure customizationType is set correctly
     modifiedProduct.customizationType = (product.customOption || 'none').toLowerCase();
+    
+    // Add "gram" to the price
+    modifiedProduct.price = `${product.price.toFixed(2)} gram`;
     
     res.status(200).json({
       success: true,
@@ -392,10 +395,14 @@ router.put('/products/:id', upload.array('productImages', 5), async (req, res) =
       { new: true, runValidators: true }
     );
     
+    // Add "gram" to the price in the response
+    const responseProduct = updatedProduct.toObject();
+    responseProduct.price = `${updatedProduct.price.toFixed(2)} gram`;
+    
     res.status(200).json({
       success: true,
       message: 'Product updated successfully',
-      product: updatedProduct
+      product: responseProduct
     });
   } catch (error) {
     console.error('Error updating product:', error);
