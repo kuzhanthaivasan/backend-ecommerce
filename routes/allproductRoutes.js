@@ -100,6 +100,7 @@ router.get('/all-products', async (req, res) => {
         name: product.name,
         description: product.description || '',
         price: product.price,
+        gram: product.gram || '', // Added gram information
         oldPrice: product.oldPrice || null,
         discount,
         image, // Keep for backward compatibility
@@ -149,9 +150,10 @@ router.get('/products/:id', async (req, res) => {
       });
     }
 
-    // Make sure we include the full images array
+    // Make sure we include the full images array and gram information
     const transformedProduct = {
       ...product.toObject(),
+      gram: product.gram || '', // Added gram information
       images: product.images || [] // Ensure the images array is included
     };
 
@@ -188,6 +190,7 @@ router.get('/products/category/:category', async (req, res) => {
     // Transform products to ensure images array is included
     const transformedProducts = products.map(product => ({
       ...product.toObject(),
+      gram: product.gram || '', // Added gram information
       images: product.images || [] // Ensure the images array is included
     }));
 
@@ -221,6 +224,7 @@ router.get('/products/customization/:type', async (req, res) => {
     // Transform products to ensure images array is included
     const transformedProducts = products.map(product => ({
       ...product.toObject(),
+      gram: product.gram || '', // Added gram information
       images: product.images || [] // Ensure the images array is included
     }));
 
