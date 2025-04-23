@@ -15,7 +15,7 @@ const isValidUrl = (url) => {
 };
 
 // Get all products
-router.get('/', async (req, res) => {
+router.get('/products', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
     console.log(`Retrieved ${products.length} products`);
@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
 });
 
 // Create product route
-router.post('/', async (req, res) => {
+router.post('/products', async (req, res) => {
   try {
     const productData = req.body;
     console.log('Creating new product:', productData.name);
@@ -65,7 +65,7 @@ router.post('/', async (req, res) => {
 });
 
 // Get single product
-router.get('/:id', async (req, res) => {
+router.get('/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -81,7 +81,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update product
-router.put('/:id', async (req, res) => {
+router.put('/products/:id', async (req, res) => {
   try {
     const productData = req.body;
     console.log(`Updating product ${req.params.id}:`, productData.name);
@@ -123,7 +123,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete product
-router.delete('/:id', async (req, res) => {
+router.delete('/products/:id', async (req, res) => {
   try {
     console.log(`Attempting to delete product with ID: ${req.params.id}`);
     
