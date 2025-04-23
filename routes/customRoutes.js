@@ -95,7 +95,8 @@ const mapProducts = (products, defaultDescription) => {
     return {
       id: product._id,
       name: product.name,
-      price: `${product.price.toFixed(2)} gram`, // Added "gram" to the price
+      price: product.price.toFixed(2),
+      gram: product.gram || 0, // Include gram in the mapped product
       mainImage: mainImage,
       image: mainImage, // For frontend integration endpoints
       images: processedImages,
@@ -155,7 +156,8 @@ router.post('/products', upload.array('productImages', 5), async (req, res) => {
     // Create a new product with the parsed data and processed images
     const newProduct = new Product({
       ...productData,
-      images: imagesList
+      images: imagesList,
+      gram: productData.gram || 0 // Ensure gram field is included
     });
     
     // Save the product to the database
@@ -185,6 +187,8 @@ router.get('/products/kids', async (req, res) => {
       customOption, 
       minPrice, 
       maxPrice,
+      minGram, // Add gram filtering
+      maxGram, // Add gram filtering
       sort 
     } = req.query;
     
@@ -215,12 +219,23 @@ router.get('/products/kids', async (req, res) => {
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
     
+    // Gram range filter
+    if (minGram || maxGram) {
+      query.gram = {};
+      if (minGram) query.gram.$gte = Number(minGram);
+      if (maxGram) query.gram.$lte = Number(maxGram);
+    }
+    
     // Create sort options based on the sort parameter
     let sortOptions = {};
     if (sort === 'price-asc') {
       sortOptions = { price: 1 };
     } else if (sort === 'price-desc') {
       sortOptions = { price: -1 };
+    } else if (sort === 'gram-asc') {
+      sortOptions = { gram: 1 };
+    } else if (sort === 'gram-desc') {
+      sortOptions = { gram: -1 };
     } else if (sort === 'alpha-asc') {
       sortOptions = { name: 1 };
     } else if (sort === 'alpha-desc') {
@@ -244,7 +259,8 @@ router.get('/products/kids', async (req, res) => {
       return {
         id: product._id,
         name: product.name,
-        price: `${product.price.toFixed(2)} gram`, // Added "gram" to the price
+        price: product.price.toFixed(2),
+        gram: product.gram || 0, // Include gram in the response
         // Return first image for outside display
         mainImage: mainImage,
         // Return all processed images for inside display
@@ -296,8 +312,8 @@ router.get('/products/:id', async (req, res) => {
     // Ensure customizationType is set correctly
     modifiedProduct.customizationType = (product.customOption || 'none').toLowerCase();
     
-    // Add "gram" to the price
-    modifiedProduct.price = `${product.price.toFixed(2)} gram`;
+    // Make sure gram is included in the response
+    modifiedProduct.gram = product.gram || 0;
     
     res.status(200).json({
       success: true,
@@ -384,6 +400,11 @@ router.put('/products/:id', upload.array('productImages', 5), async (req, res) =
       productData.customizationType = productData.customOption.toLowerCase();
     }
     
+    // Make sure gram is included in the update
+    if (productData.gram !== undefined) {
+      productData.gram = Number(productData.gram) || 0;
+    }
+    
     // Remove newImages and deleteImages from the data to be updated
     delete productData.newImages;
     delete productData.deleteImages;
@@ -395,14 +416,10 @@ router.put('/products/:id', upload.array('productImages', 5), async (req, res) =
       { new: true, runValidators: true }
     );
     
-    // Add "gram" to the price in the response
-    const responseProduct = updatedProduct.toObject();
-    responseProduct.price = `${updatedProduct.price.toFixed(2)} gram`;
-    
     res.status(200).json({
       success: true,
       message: 'Product updated successfully',
-      product: responseProduct
+      product: updatedProduct
     });
   } catch (error) {
     console.error('Error updating product:', error);
@@ -468,11 +485,24 @@ router.delete('/products/:id', async (req, res) => {
 const getProductsByCategory = (peopleCategory, productCategory, defaultDescription) => {
   return async (req, res) => {
     try {
-      const products = await Product.find({
+      // Get query parameters for gram filtering
+      const { minGram, maxGram } = req.query;
+      
+      // Build query
+      const query = {
         peopleCategory: peopleCategory,
         productCategory: productCategory,
         customOption: { $ne: 'None' } // Exclude products with customOption "None"
-      });
+      };
+      
+      // Add gram filtering if provided
+      if (minGram || maxGram) {
+        query.gram = {};
+        if (minGram) query.gram.$gte = Number(minGram);
+        if (maxGram) query.gram.$lte = Number(maxGram);
+      }
+      
+      const products = await Product.find(query);
       
       const mappedProducts = mapProducts(products, defaultDescription);
       
@@ -507,14 +537,16 @@ router.get('/products/men/bracelets', getProductsByCategory('Male', 'Bracelets',
 // ADVANCED FILTERED ROUTES
 // ======================================================
 
-// Modified advanced filtering route generator to exclude customOption: "None"
+// Modified advanced filtering route generator to include gram filtering
 const createFilteredProductRoute = (endpoint, peopleCategory, productCategory, defaultDescription) => {
   router.get(endpoint, async (req, res) => {
     try {
       // Extract query parameters
       const { 
         minPrice = 0, 
-        maxPrice = 2000, 
+        maxPrice = 2000,
+        minGram = 0,
+        maxGram = 1000,
         customizationType = "all",
         sortBy = "featured"
       } = req.query;
@@ -524,11 +556,12 @@ const createFilteredProductRoute = (endpoint, peopleCategory, productCategory, d
         peopleCategory: peopleCategory,
         productCategory: productCategory,
         price: { $gte: Number(minPrice), $lte: Number(maxPrice) },
+        gram: { $gte: Number(minGram), $lte: Number(maxGram) }, // Add gram filtering
         customOption: { $ne: 'None' } // Exclude products with customOption "None"
       };
       
       // Apply customization filter (but never include "None")
-      if (customizationType !== "all" && ["fingerprint", "engraving", "image","combined"].includes(customizationType)) {
+      if (customizationType !== "all" && ["fingerprint", "engraving", "image", "combined"].includes(customizationType)) {
         query.customOption = customizationType.charAt(0).toUpperCase() + customizationType.slice(1);
       }
       
@@ -538,6 +571,8 @@ const createFilteredProductRoute = (endpoint, peopleCategory, productCategory, d
         'alpha-desc': { name: -1 },
         'price-asc': { price: 1 },
         'price-desc': { price: -1 },
+        'gram-asc': { gram: 1 },
+        'gram-desc': { gram: -1 },
         'featured': { createdAt: -1 }
       }[sortBy] || { createdAt: -1 };
       
@@ -572,5 +607,64 @@ createFilteredProductRoute('/women-bracelets', 'Female', 'Bracelets', 'Elegant b
 createFilteredProductRoute('/men-rings', 'Male', 'Ring', 'Sophisticated ring for men');
 createFilteredProductRoute('/men-pendants', 'Male', 'Pendants', 'Sophisticated pendant for men');
 createFilteredProductRoute('/men-bracelets', 'Male', 'Bracelets', 'Sophisticated bracelet for men');
+
+// ======================================================
+// NEW ROUTE FOR GRAM-BASED FILTERING
+// ======================================================
+
+// Route to get products by gram range
+router.get('/products/by-gram', async (req, res) => {
+  try {
+    const { 
+      minGram = 0, 
+      maxGram = 1000,
+      peopleCategory,
+      productCategory,
+      sortBy = "gram-asc"
+    } = req.query;
+    
+    // Build the query with gram range
+    const query = {
+      gram: { 
+        $gte: Number(minGram), 
+        $lte: Number(maxGram) 
+      },
+      customOption: { $ne: 'None' } // Exclude products with customOption "None"
+    };
+    
+    // Add optional filters if provided
+    if (peopleCategory) {
+      query.peopleCategory = peopleCategory;
+    }
+    
+    if (productCategory) {
+      query.productCategory = productCategory;
+    }
+    
+    // Determine sort options
+    const sortOptions = {
+      'gram-asc': { gram: 1 },
+      'gram-desc': { gram: -1 },
+      'price-asc': { price: 1 },
+      'price-desc': { price: -1 },
+      'featured': { createdAt: -1 }
+    }[sortBy] || { gram: 1 }; // Default to sorting by gram ascending
+    
+    // Execute query with sorting
+    const products = await Product.find(query).sort(sortOptions);
+    
+    // Transform results
+    const transformedProducts = mapProducts(products, "Jewelry piece by weight");
+    
+    res.status(200).json({
+      success: true,
+      count: transformedProducts.length,
+      products: transformedProducts
+    });
+    
+  } catch (error) {
+    handleError(res, "products by gram", error);
+  }
+});
 
 module.exports = router;
