@@ -387,6 +387,8 @@ router.get('/products', async (req, res) => {
       priceRange,
       minPrice,
       maxPrice,
+      minGram,
+      maxGram,
       sortBy 
     } = req.query;
     
@@ -418,6 +420,13 @@ router.get('/products', async (req, res) => {
       query.price = {};
       if (minPrice) query.price.$gte = parseInt(minPrice);
       if (maxPrice) query.price.$lte = parseInt(maxPrice);
+    }
+    
+    // Filter by min and max gram if provided
+    if (minGram || maxGram) {
+      query.gram = {};
+      if (minGram) query.gram.$gte = parseInt(minGram);
+      if (maxGram) query.gram.$lte = parseInt(maxGram);
     }
     
     console.log('Database query:', JSON.stringify(query));
@@ -469,6 +478,8 @@ router.get('/products/category/men', async (req, res) => {
       priceRange,
       minPrice,
       maxPrice,
+      minGram,
+      maxGram,
       sortBy 
     } = req.query;
     
@@ -494,6 +505,13 @@ router.get('/products/category/men', async (req, res) => {
       query.price = {};
       if (minPrice) query.price.$gte = parseInt(minPrice);
       if (maxPrice) query.price.$lte = parseInt(maxPrice);
+    }
+    
+    // Filter by min and max gram if provided
+    if (minGram || maxGram) {
+      query.gram = {};
+      if (minGram) query.gram.$gte = parseInt(minGram);
+      if (maxGram) query.gram.$lte = parseInt(maxGram);
     }
     
     console.log('Men\'s products query:', JSON.stringify(query));
@@ -545,6 +563,8 @@ router.get('/products/category/women', async (req, res) => {
       priceRange,
       minPrice,
       maxPrice,
+      minGram,
+      maxGram,
       sortBy 
     } = req.query;
     
@@ -571,6 +591,13 @@ router.get('/products/category/women', async (req, res) => {
       query.price = {};
       if (minPrice) query.price.$gte = parseInt(minPrice);
       if (maxPrice) query.price.$lte = parseInt(maxPrice);
+    }
+    
+    // Filter by min and max gram if provided
+    if (minGram || maxGram) {
+      query.gram = {};
+      if (minGram) query.gram.$gte = parseInt(minGram);
+      if (maxGram) query.gram.$lte = parseInt(maxGram);
     }
     
     let products = await Product.find(query);
@@ -616,6 +643,8 @@ router.get('/products/category/kids', async (req, res) => {
       priceRange,
       minPrice,
       maxPrice,
+      minGram,
+      maxGram, 
       sortBy 
     } = req.query;
     const query = { 
@@ -640,6 +669,13 @@ router.get('/products/category/kids', async (req, res) => {
       query.price = {};
       if (minPrice) query.price.$gte = parseInt(minPrice);
       if (maxPrice) query.price.$lte = parseInt(maxPrice);
+    }
+    
+    // Filter by min and max gram if provided
+    if (minGram || maxGram) {
+      query.gram = {};
+      if (minGram) query.gram.$gte = parseInt(minGram);
+      if (maxGram) query.gram.$lte = parseInt(maxGram);
     }
     
     let products = await Product.find(query);
@@ -685,6 +721,8 @@ router.get('/products/category/unisex', async (req, res) => {
       priceRange,
       minPrice,
       maxPrice,
+      minGram,
+      maxGram,
       sortBy 
     } = req.query;
     
@@ -700,6 +738,13 @@ router.get('/products/category/unisex', async (req, res) => {
       query.price = {};
       if (minPrice) query.price.$gte = parseInt(minPrice);
       if (maxPrice) query.price.$lte = parseInt(maxPrice);
+    }
+    
+    // Filter by min and max gram if provided
+    if (minGram || maxGram) {
+      query.gram = {};
+      if (minGram) query.gram.$gte = parseInt(minGram);
+      if (maxGram) query.gram.$lte = parseInt(maxGram);
     }
     
     let products = await Product.find(query);
@@ -745,6 +790,8 @@ router.get('/products/category/couples', async (req, res) => {
       priceRange,
       minPrice,
       maxPrice,
+      minGram,
+      maxGram,
       sortBy 
     } = req.query;
     
@@ -770,6 +817,13 @@ router.get('/products/category/couples', async (req, res) => {
       query.price = {};
       if (minPrice) query.price.$gte = parseInt(minPrice);
       if (maxPrice) query.price.$lte = parseInt(maxPrice);
+    }
+    
+    // Filter by min and max gram if provided
+    if (minGram || maxGram) {
+      query.gram = {};
+      if (minGram) query.gram.$gte = parseInt(minGram);
+      if (maxGram) query.gram.$lte = parseInt(maxGram);
     }
     
     console.log('Couples products query:', JSON.stringify(query));
@@ -831,13 +885,185 @@ router.get('/diagnostic', async (req, res) => {
     
     res.json({
       dbStatus,
-      totalProducts: allProducts.length,
+     totalProducts: allProducts.length,
       productsByCategory,
-      sampleProduct: allProducts.length > 0 ? allProducts[0] : null
+      productTypes: {
+        gold: await Product.countDocuments({ productType: "Gold" }),
+        silver: await Product.countDocuments({ productType: "Silver" })
+      },
+      productCategories: {
+        chains: await Product.countDocuments({ productCategory: "Chain" }),
+        rings: await Product.countDocuments({ productCategory: "Ring" }),
+        bracelets: await Product.countDocuments({ productCategory: "Bracelet" }),
+        earrings: await Product.countDocuments({ productCategory: "Earring" }),
+        necklaces: await Product.countDocuments({ productCategory: "Necklace" })
+      },
+      lastAddedProduct: allProducts.length > 0 ? 
+        allProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0] : null
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Diagnostic error:', error);
+    res.status(500).json({ 
+      message: 'Server error during diagnostic', 
+      error: error.message,
+      dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
   }
 });
+
+// Endpoint for custom products
+router.get('/products/custom', async (req, res) => {
+  try {
+    const { 
+      peopleCategory,
+      productCategory, 
+      productType, 
+      customOption,
+      sortBy 
+    } = req.query;
+    
+    // Building the query object - filter for custom products
+    const query = { 
+      customOption: { $ne: "None" },
+      customOption: { $exists: true }
+    };
+    
+    // Additional filters
+    if (peopleCategory) query.peopleCategory = peopleCategory;
+    if (productCategory) query.productCategory = productCategory;
+    if (productType) query.productType = productType;
+    if (customOption) query.customOption = customOption;
+    
+    console.log('Custom products query:', JSON.stringify(query));
+    
+    // Get products from the database
+    let products = await Product.find(query);
+    
+    // Apply sorting
+    if (sortBy) {
+      switch (sortBy) {
+        case 'alpha-asc':
+          products.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        case 'alpha-desc':
+          products.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+        case 'price-asc':
+          products.sort((a, b) => a.price - b.price);
+          break;
+        case 'price-desc':
+          products.sort((a, b) => b.price - a.price);
+          break;
+        default:
+          // Default sorting
+          products.sort((a, b) => {
+            if (a.createdAt && b.createdAt) {
+              return new Date(b.createdAt) - new Date(a.createdAt);
+            }
+            return 0;
+          });
+      }
+    }
+    
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching custom products:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Delete a product by ID
+router.delete('/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const product = await Product.findByIdAndDelete(id);
+    
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    
+    // If the product had images stored on the server, delete them
+    if (product.imageUrl && product.imageUrl.startsWith('/uploads/')) {
+      const imagePath = path.join(permanentUploadsDir, path.basename(product.imageUrl));
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+        console.log(`Deleted image file: ${imagePath}`);
+      }
+    }
+    
+    // Handle multiple images if present
+    if (product.imageUrls && Array.isArray(product.imageUrls)) {
+      for (const url of product.imageUrls) {
+        if (url.startsWith('/uploads/')) {
+          const imagePath = path.join(permanentUploadsDir, path.basename(url));
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+            console.log(`Deleted image file: ${imagePath}`);
+          }
+        }
+      }
+    }
+    
+    res.json({ message: 'Product deleted successfully', deletedProduct: product });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get product categories and counts
+router.get('/product-categories', async (req, res) => {
+  try {
+    const categories = await Product.aggregate([
+      { $group: { _id: "$productCategory", count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+    
+    res.json(categories);
+  } catch (error) {
+    console.error('Error fetching product categories:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get product types and counts
+router.get('/product-types', async (req, res) => {
+  try {
+    const types = await Product.aggregate([
+      { $group: { _id: "$productType", count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+    
+    res.json(types);
+  } catch (error) {
+    console.error('Error fetching product types:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get price range stats
+router.get('/price-stats', async (req, res) => {
+  try {
+    const stats = await Product.aggregate([
+      {
+        $group: {
+          _id: null,
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" },
+          avgPrice: { $avg: "$price" }
+        }
+      }
+    ]);
+    
+    res.json(stats[0] || { minPrice: 0, maxPrice: 0, avgPrice: 0 });
+  } catch (error) {
+    console.error('Error fetching price stats:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Route to serve uploaded images
+router.use('/uploads', express.static(permanentUploadsDir));
 
 module.exports = router;
