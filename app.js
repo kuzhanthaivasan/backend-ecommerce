@@ -86,30 +86,35 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 });
 
 // -------------------- DATABASE CONNECTION --------------------
+const mongoose = require('mongoose');
+
 const connectDB = async (retries = 5, delay = 5000) => {
+  const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://vasanravi12032004:vasan100vasan100@cluster3.9jyjy3k.mongodb.net/Rmj';
+
   for (let i = 0; i < retries; i++) {
     try {
-      await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://vasanravi12032004:vasan100vasan100@cluster3.9jyjy3k.mongodb.net/Rmj', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      });
-      console.log(`MongoDB Connected: ${mongoose.connection.host}`);
+      await mongoose.connect(MONGODB_URI);
+      console.log(`✅ MongoDB Connected: ${mongoose.connection.host}`);
       return;
     } catch (err) {
-      console.error(`MongoDB Connection Error (attempt ${i + 1}/${retries}):`, err);
+      console.error(`❌ MongoDB Connection Error (attempt ${i + 1}/${retries}):`, err.message);
       if (i < retries - 1) {
-        console.log(`Retrying in ${delay / 1000} seconds...`);
+        console.log(`🔁 Retrying in ${delay / 1000} seconds...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }
-  throw new Error('Failed to connect to MongoDB');
+
+  // All retries failed
+  throw new Error('❌ Failed to connect to MongoDB after multiple attempts');
 };
 
+// Start connection
 connectDB().catch(err => {
-  console.error('Failed to establish MongoDB connection:', err);
+  console.error('🚨 Final MongoDB connection failure:', err.message);
   process.exit(1);
 });
+
 
 
 
