@@ -93,7 +93,7 @@ const connectDB = async (retries = 5, delay = 5000) => {
 
   for (let i = 0; i < retries; i++) {
     try {
-      await mongoose.connect(MONGODB_URI);
+      await mongoose.connect(MONGO_URI);
       console.log(`✅ MongoDB Connected: ${mongoose.connection.host}`);
       return;
     } catch (err) {
