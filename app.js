@@ -86,7 +86,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 });
 
 // -------------------- DATABASE CONNECTION --------------------
-const mongoose = require('mongoose');
+
 
 const connectDB = async (retries = 5, delay = 5000) => {
   const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://vasanravi12032004:vasan100vasan100@cluster3.9jyjy3k.mongodb.net/Rmj';
