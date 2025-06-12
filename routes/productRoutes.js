@@ -28,33 +28,39 @@ router.get('/products', async (req, res) => {
   }
 });
 
-// POST /products
+// Create product route
 router.post('/products', async (req, res) => {
   try {
     const productData = req.body;
-
-    // Validate required fields
-    if (!productData.name || !productData.price || productData.stock == null) {
-      return res.status(400).json({
-        message: 'Name, price, and stock are required fields.'
-      });
-    }
-
     console.log('Creating new product:', productData.name);
-
-    // Validate and filter image URLs
-    if (Array.isArray(productData.images)) {
-      productData.images = productData.images.filter(img => isValidUrl(img));
+    
+    // Process images to ensure they are valid URLs
+    if (productData.images && productData.images.length) {
+      const processedImages = [];
+      
+      for (let img of productData.images) {
+        // If it's a valid URL, add it
+        if (isValidUrl(img)) {
+          processedImages.push(img);
+          continue;
+        }
+        
+        // Skip invalid images
+        console.log('Skipping invalid image URL:', 
+          img.substring(0, 50) + (img.length > 50 ? '...' : ''));
+      }
+      
+      productData.images = processedImages;
     }
-
+    
     const product = new Product(productData);
-    const saved = await product.save();
-
-    console.log('✅ Product saved:', saved._id);
-    res.status(201).json(saved);
+    const newProduct = await product.save();
+    console.log('New product saved:', newProduct._id);
+    
+    res.status(201).json(newProduct);
   } catch (err) {
-    console.error('❌ Error saving product:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('Error creating product:', err);
+    res.status(400).json({ message: err.message });
   }
 });
 
