@@ -1,6 +1,7 @@
 // routes/productRoutes.js
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const { Product } = require('../models');
 
 // Helper function to validate URL
