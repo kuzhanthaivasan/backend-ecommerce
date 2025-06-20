@@ -89,7 +89,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 
 
 const connectDB = async (retries = 5, delay = 5000) => {
-  const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://vasanravi12032004:vasan100vasan100@cluster3.9jyjy3k.mongodb.net/Rmj';
+  const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://Rmj:Rajamanijewellery35@cluster0.eownver.mongodb.net/Rmj';
 
   for (let i = 0; i < retries; i++) {
     try {
